@@ -42,7 +42,7 @@ mContext=context;
     @Override
     protected Void doInBackground(ByteBuffer... byteBuffers) {
        ByteBuffer buff=byteBuffers[0];
-       for(int i=0;i<buff.array().length-13;i+=5){
+       for(int i=0;i<buff.array().length-13;i+=4){
            mIntensity=0;
            for (int r=0;r<3;r++) {
                mIntensity += buff.get(i + r);
