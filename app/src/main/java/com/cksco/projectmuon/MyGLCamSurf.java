@@ -71,6 +71,7 @@ public class MyGLCamSurf extends GLSurfaceView implements GLSurfaceView.Renderer
 
     }
     protected boolean testerBool;
+    protected PhotoAnalysis mAnalysis;
     protected int mStartX,mStartY,mEndX,mEndY;
     protected final MainActivity main=new MainActivity();
     protected FrameAnalysis mFrames=new FrameAnalysis();
@@ -182,6 +183,7 @@ mFullQuadVertices.put(QUAD_COORD).position(0);
             mStartY=(mHeight/2)-(newSize.height/2);
             mEndX=(mWidth/2)+(newSize.width/2);
             mEndY=(mHeight/2)+(newSize.height/2);
+            mAnalysis=new PhotoAnalysis(newSize.width,newSize.height,getContext());
            testerBool=true;
             System.out.println(newSize.width+" , "+newSize.height );
 
@@ -318,13 +320,7 @@ mFullQuadVertices.put(QUAD_COORD).position(0);
 
         GLES20.glReadPixels(mStartX,mStartY,width,height,GLES20.GL_RGBA,GLES20.GL_UNSIGNED_BYTE,byteBuf);
         long start=System.currentTimeMillis();
-        //int a=0;
-       // for(int i=0;i<byteBuf.array().length-1;i++){
-           // a++;
-
-      //  }
-        long total=start-System.currentTimeMillis();
-        //Log.println(Log.ASSERT,"TESTER","total time : "+total+" amount of pixels"+a/4);
+        new PhotoAnalysis(width,height,getContext()).execute(byteBuf);
 
         byteBuf.rewind();
         Bitmap bitmap= Bitmap.createBitmap(width,height,Bitmap.Config.ARGB_8888);
