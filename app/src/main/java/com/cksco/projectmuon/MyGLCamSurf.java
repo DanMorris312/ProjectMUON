@@ -43,6 +43,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.lang.ref.Reference;
+import java.lang.ref.ReferenceQueue;
+import java.lang.ref.SoftReference;
+import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.IntBuffer;
@@ -147,10 +151,12 @@ public class MyGLCamSurf extends GLSurfaceView implements GLSurfaceView.Renderer
         if (psize.size() > 0) {
             int i;
             for (i = 0; i < psize.size(); i++) {
+                Log.println(Log.ASSERT,"RES"," : "+psize.get(i).width+" "+psize.get(i).height);
+                if (psize.get(i).width >newSize.width || psize.get(i).height >newSize.height) {
 
-                if (psize.get(i).width < newSize.width || psize.get(i).height < newSize.height) {
-                    newSize = psize.get(i);
-                    //break;
+                    newSize = psize.get(0);
+
+
                 }
 
             }
@@ -164,9 +170,9 @@ public class MyGLCamSurf extends GLSurfaceView implements GLSurfaceView.Renderer
             mStartY = (mHeight / 2) - (newSize.height / 2);
             mEndX = (mWidth / 2) + (newSize.width / 2);
             mEndY = (mHeight / 2) + (newSize.height / 2);
-            mAnalysis = new PhotoAnalysis(newSize.width, newSize.height, getContext());
+
             testerBool = true;
-            System.out.println(newSize.width + " , " + newSize.height);
+            System.out.println("WIDTH IS HERE    "+newSize.width + " , " + newSize.height);
 
         }
 
@@ -289,18 +295,31 @@ public class MyGLCamSurf extends GLSurfaceView implements GLSurfaceView.Renderer
     }
 
 
-    public Bitmap analyzPixels() {
+    public void analyzPixels() {
         // int width = getWidth()-mEndX;
         // int height = getHeight()-mEndY;
         // Log.println(Log.ASSERT,"TESTER","width : "+(mEndX-mStartX)+" height"+(mEndY-mStartY));
+        System.gc();
+        ByteBuffer byteBuf;
         int width = mEndX - mStartX;
         int height = mEndY - mStartY;
-        ByteBuffer byteBuf = allocateDirect(width * height * 4);
-        byteBuf.order(ByteOrder.LITTLE_ENDIAN);
+        try {
+            byteBuf = allocateDirect(width * height * 4);
 
-        GLES20.glReadPixels(mStartX, mStartY, width, height, GLES20.GL_RGBA, GLES20.GL_UNSIGNED_BYTE, byteBuf);
-        long start = System.currentTimeMillis();
-        new PhotoAnalysis(width, height, getContext()).execute(byteBuf);
+            //  byteBuf.order(ByteOrder.LITTLE_ENDIAN);
+
+            GLES20.glReadPixels(mStartX, mStartY, width, height, GLES20.GL_RGBA, GLES20.GL_UNSIGNED_BYTE, byteBuf);
+            new PhotoAnalysis(width, height, getContext()).execute(byteBuf);
+
+            byteBuf.clear();
+            return;
+        }catch(OutOfMemoryError e){
+            return;
+        }
+
+
+      /*  long start = System.currentTimeMillis();
+
 
         byteBuf.rewind();
         Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
@@ -322,9 +341,10 @@ public class MyGLCamSurf extends GLSurfaceView implements GLSurfaceView.Renderer
 
 
         return bitmap2;
-
+*/
 
     }
+
 }
 
 

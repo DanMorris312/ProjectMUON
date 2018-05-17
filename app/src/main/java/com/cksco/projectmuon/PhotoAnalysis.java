@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.util.Log;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -25,6 +26,7 @@ int mThreshold;
 int mIntensity;
 int mWidth,mHeight;
 Context mContext;
+
 //constructors setting width and height of the area to be analysed, as well as the context for it.
 PhotoAnalysis(int width,int height){
     mWidth=width;
@@ -40,9 +42,14 @@ mContext=context;
     //setting threshold before the thread is executed.
     protected void onPreExecute() {
         super.onPreExecute();
-        mThreshold=300;
+        mThreshold=156;
 
     }
+   @Override
+   protected void onPostExecute(Void v){
+   super.onPostExecute(v);
+      // Log.println(Log.ASSERT,"DUN","AYYYY THE THREADS DED");
+   }
 
     @Override
     // the main workload of the thread
@@ -61,27 +68,29 @@ mContext=context;
                return null; // this isn't a regular Void, it's from Java.lang so it needs a return statement. in this case we merely return null as we know the thread is done running at this point
            }
        }
+
        return null; // end background task.
+
 
     }
     protected void downloadFromBuffer(ByteBuffer buff,String filename){
-        buff.rewind();
-        Bitmap bitmap= Bitmap.createBitmap(mWidth,mHeight,Bitmap.Config.ARGB_8888); // creating empty bitmpa, and then filling it and scaling it.
+            buff.rewind();
+            Bitmap bitmap= Bitmap.createBitmap(mWidth,mHeight,Bitmap.Config.ARGB_8888); // creating empty bitmpa, and then filling it and scaling it.
 
-        bitmap.copyPixelsFromBuffer(buff);
-        android.graphics.Matrix matrix=new android.graphics.Matrix();
-        matrix.preScale(1f,-1f);
-        Bitmap bitmap2=Bitmap.createBitmap(bitmap,0,0,bitmap.getWidth(),bitmap.getHeight(),matrix,false);
-        bitmap=null;
-        //setting up all nessecary things to create the PNG.
-        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-        bitmap2.compress(Bitmap.CompressFormat.PNG, 50, bytes);
-        File extStorDirect = Environment.getExternalStorageDirectory();
-        File file = new File(extStorDirect + File.separator + filename);
-        FileOutputStream fileOutputStream = null;
-        try {
-            //creating the PNG.
-            file.createNewFile();
+            bitmap.copyPixelsFromBuffer(buff);
+            android.graphics.Matrix matrix=new android.graphics.Matrix();
+            matrix.preScale(1f,-1f);
+            Bitmap bitmap2=Bitmap.createBitmap(bitmap,0,0,bitmap.getWidth(),bitmap.getHeight(),matrix,false);
+            bitmap=null;
+            //setting up all nessecary things to create the PNG.
+            ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+            bitmap2.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+            File extStorDirect = Environment.getExternalStorageDirectory();
+            File file = new File(extStorDirect + File.separator + filename);
+            FileOutputStream fileOutputStream = null;
+            try {
+                //creating the PNG.
+                file.createNewFile();
             fileOutputStream = new FileOutputStream(file);
             fileOutputStream.write(bytes.toByteArray());
             ContentResolver cr = mContext.getContentResolver();
@@ -91,7 +100,8 @@ mContext=context;
             String description = "My bitmap created by Android-er";
             String savedURL = MediaStore.Images.Media
                     .insertImage(cr, imagePath, name, description);
-           System.out.println("file made bois");
+                Log.println(Log.ASSERT,"DUN","file made bois");
+
 
          // Basic try catches and closing the fileoutput stream.
         } catch (IOException e) {
