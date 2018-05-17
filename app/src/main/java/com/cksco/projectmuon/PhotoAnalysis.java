@@ -107,7 +107,9 @@ mContext=context;
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
-        } finally {
+        }catch(OutOfMemoryError e){
+            return;
+            }finally {
             if (fileOutputStream != null) {
                 try {
                     fileOutputStream.close();

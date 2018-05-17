@@ -154,7 +154,7 @@ public class MyGLCamSurf extends GLSurfaceView implements GLSurfaceView.Renderer
                 Log.println(Log.ASSERT,"RES"," : "+psize.get(i).width+" "+psize.get(i).height);
                 if (psize.get(i).width >newSize.width || psize.get(i).height >newSize.height) {
 
-                    newSize = psize.get(0);
+                    newSize = psize.get(i);
 
 
                 }
