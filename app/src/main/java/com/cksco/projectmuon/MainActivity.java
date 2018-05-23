@@ -3,6 +3,8 @@ package com.cksco.projectmuon;
 import android.Manifest;
 import android.app.Activity;
 import android.content.ContentResolver;
+import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -26,9 +28,11 @@ public class MainActivity extends AppCompatActivity {
     final int REQUEST_CODE_MULTI_PERM = 74;
     boolean mAllPermGrant=false;
     private MyGLCamSurf mRenderer;
+    final String[] PERMISSIONS={android.Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
         if (Build.VERSION.SDK_INT >= 19) {
 
             _callMultiPerms();
@@ -36,12 +40,16 @@ public class MainActivity extends AppCompatActivity {
         } else {
 
         }
+          if(!hasPermissions(this,PERMISSIONS)){
+            _callMultiPerms();
 
-        super.onCreate(savedInstanceState);
+          }
+          else startActivity(new Intent(this,Main2Activity.class));
+
 
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-      //  getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-             //   WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         setContentView(R.layout.activity_main);
     /*    if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)
@@ -49,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
             if(ContextCompat.checkSelfPermission(this,Manifest.permission.WRITE_EXTERNAL_STORAGE)!=PackageManager.PERMISSION_GRANTED)
                 ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},0);*/
 
-        mRenderer = (MyGLCamSurf) findViewById(R.id.renderer_view);
+       // mRenderer = (MyGLCamSurf) findViewById(R.id.renderer_view);
 
 
     }
@@ -119,7 +127,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onPause() {
         super.onPause();
-        mRenderer.onDestroy();
+
 
     }
 
@@ -127,7 +135,7 @@ public class MainActivity extends AppCompatActivity {
     public void onResume() {
         super.onResume();
 
-        mRenderer.onResume();
+
     }
 
     public ContentResolver getCR() {
@@ -150,6 +158,8 @@ public class MainActivity extends AppCompatActivity {
                         && perms.get(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
           mAllPermGrant=true;
 
+          startActivity(new Intent(this,Main2Activity.class));
+
                 } else {
 
                     Toast.makeText(MainActivity.this, "Some Permission is Denied", Toast.LENGTH_SHORT)
@@ -160,5 +170,15 @@ public class MainActivity extends AppCompatActivity {
             default:
                 super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
+    }
+    private static boolean hasPermissions(Context context, String... permissions) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && context != null && permissions != null) {
+            for (String permission : permissions) {
+                if (ActivityCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 }
