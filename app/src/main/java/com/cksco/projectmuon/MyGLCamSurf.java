@@ -301,14 +301,14 @@ public class MyGLCamSurf extends GLSurfaceView implements GLSurfaceView.Renderer
         // Log.println(Log.ASSERT,"TESTER","width : "+(mEndX-mStartX)+" height"+(mEndY-mStartY));
         System.gc();
         ByteBuffer byteBuf;
-        int width = mEndX - mStartX;
-        int height = mEndY - mStartY;
+        int width = getWidth();
+        int height = getHeight();
         try {
             byteBuf = allocateDirect(width * height * 4);
 
-            //  byteBuf.order(ByteOrder.LITTLE_ENDIAN);
+              byteBuf.order(ByteOrder.LITTLE_ENDIAN);
 
-            GLES20.glReadPixels(mStartX, mStartY, width, height, GLES20.GL_RGBA, GLES20.GL_UNSIGNED_BYTE, byteBuf);
+            GLES20.glReadPixels(0,0,width,height ,GLES20.GL_RGBA, GLES20.GL_UNSIGNED_BYTE, byteBuf);
             new PhotoAnalysis(width, height, getContext()).execute(byteBuf);
 
             byteBuf.clear();
